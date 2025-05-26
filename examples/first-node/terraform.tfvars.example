@@ -1,0 +1,7 @@
+ip_address         = "10.0.0.10"  # Change this to your Proxmox host IP
+root_password      = "your-root-password"
+automation_password = "your-automation-password"
+network_ports      = ["eth0"]     # Change this to match your network interface
+ssh_port          = 22           # Change this if you want a different SSH port
+vm_password        = "your-vm-password"
+ssh_public_key     = "your-ssh-public-key" 
