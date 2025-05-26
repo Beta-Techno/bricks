@@ -16,29 +16,35 @@ provider "proxmox" {
   pm_tls_insecure     = true
 }
 
+# Check if template exists
+data "proxmox_virtual_machine" "template" {
+  vmid = var.template_name
+  node = var.target_node
+}
+
 # Create a VM
 resource "proxmox_vm_qemu" "test_vm" {
-  name        = "test-vm"
-  target_node = "pve"  # Change this to your node name
-  vmid        = 100    # Change this to your desired VMID
-  clone       = "ubuntu-22.04-template"  # Change this to your template name
+  name        = var.vm_name
+  target_node = var.target_node
+  vmid        = var.vm_id
+  clone       = data.proxmox_virtual_machine.template.name
   full_clone  = true
 
-  cores   = 2
-  sockets = 1
-  memory  = 2048
+  cores   = var.vm_cores
+  sockets = var.vm_sockets
+  memory  = var.vm_memory
 
   network {
-    bridge = "vmbr0"
+    bridge = var.network_bridge
     model  = "virtio"
   }
 
   disk {
     type    = "scsi"
-    storage = "local-lvm"
-    size    = "10G"
+    storage = var.storage_pool
+    size    = var.vm_disk_size
   }
 
   os_type = "cloud-init"
-  ipconfig0 = "ip=dhcp"
+  ipconfig0 = var.ip_config
 } 

@@ -68,7 +68,7 @@ Each environment includes:
 
 * Environment State
 
-Each environment manages its own state:
+State management features are planned for future implementation:
 
 - Remote state storage
 - State locking
@@ -81,8 +81,6 @@ Each environment follows security best practices:
 
 - Provider authentication
 - Module authentication
-- State encryption
-- Access control
 - Variable validation
 - Sensitive data handling
 
@@ -98,7 +96,7 @@ The typical workflow is:
 
 * Environment Testing
 
-Each environment should include:
+Environment testing is planned for future implementation and will include:
 
 - Configuration validation
 - State validation

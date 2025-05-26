@@ -12,6 +12,7 @@ The host module manages the initial configuration of a Proxmox host, including u
 - User and API token management
 - Security hardening
 - Basic network setup (SSH)
+- Local storage configuration
 
 * Usage
 
@@ -24,7 +25,7 @@ module "proxmox_host" {
   automation_password = var.automation_password
   network_ports      = var.network_ports
   ssh_port          = var.ssh_port
-  ssh_public_key    = var.ssh_public_key
+  storage_path      = var.storage_path
 }
 #+END_SRC
 
@@ -37,7 +38,7 @@ module "proxmox_host" {
 | automation_password | The password for the automation user | string | n/a | yes |
 | network_ports | List of network ports to configure | list(string) | ["eth0"] | no |
 | ssh_port | The SSH port to use | number | 22 | no |
-| ssh_public_key | The SSH public key for the VM user | string | n/a | yes |
+| storage_path | The path to the storage device for local-lvm | string | "/dev/sda3" | no |
 
 * Outputs
 
@@ -66,7 +67,7 @@ module "proxmox_host" {
   automation_password = "your-automation-password"
   network_ports      = ["eth0"]
   ssh_port          = 22
-  ssh_public_key    = "ssh-rsa AAAA..."
+  storage_path      = "/dev/sda3"
 }
 #+END_SRC
 
@@ -75,7 +76,9 @@ module "proxmox_host" {
 - The root password must be at least 8 characters long
 - The automation password must be at least 8 characters long
 - The IP address must be a valid IPv4 address
-- The SSH public key must be in the correct format
+- The storage path must be a valid device path (e.g., /dev/sda3)
+- Network port names must be alphanumeric
+- The SSH port must be between 1 and 65535
 
 * See Also
 - [[file:../../architecture/overview.org][Architecture Overview]]

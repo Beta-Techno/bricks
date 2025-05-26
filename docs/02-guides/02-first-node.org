@@ -11,7 +11,6 @@ This guide will help you set up your first Proxmox node using the Bricks infrast
 - Terraform installed
 - Proxmox host available
 - SSH access to Proxmox host
-- SSH key pair generated
 - Basic understanding of Terraform
 - Basic understanding of Proxmox
 
@@ -49,7 +48,7 @@ module "proxmox_host" {
   automation_password = var.automation_password
   network_ports      = var.network_ports
   ssh_port          = var.ssh_port
-  ssh_public_key    = var.ssh_public_key
+  storage_path      = var.storage_path
 }
 #+END_SRC
 
@@ -70,14 +69,6 @@ module "proxmox_network" {
       comment    = "Main bridge for VM networking"
     }
   }
-  
-  vlans = {
-    "vlan100" = {
-      vlan_id    = 100
-      interface  = "vmbr0"
-      comment    = "VLAN for internal network"
-    }
-  }
 }
 #+END_SRC
 
@@ -94,16 +85,8 @@ module "proxmox_storage" {
   pools = {
     "local-lvm" = {
       type    = "lvm"
-      path    = "/dev/pve/data"
+      path    = var.storage_path
       comment = "Local LVM storage pool"
-    }
-  }
-  
-  volumes = {
-    "local-lvm" = {
-      pool    = "local-lvm"
-      size    = "100G"
-      comment = "Local LVM volume"
     }
   }
 }
@@ -152,9 +135,10 @@ variable "ssh_port" {
   default     = 22
 }
 
-variable "ssh_public_key" {
-  description = "The SSH public key for the VM user"
+variable "storage_path" {
+  description = "The path to the storage device for local-lvm"
   type        = string
+  default     = "/dev/sda3"
 }
 
 variable "hostname" {
@@ -172,7 +156,7 @@ root_password      = "your-root-password"
 automation_password = "your-automation-password"
 network_ports      = ["eth0"]
 ssh_port          = 22
-ssh_public_key    = "ssh-rsa AAAA..."
+storage_path      = "/dev/sda3"
 hostname          = "pve"
 #+END_SRC
 
@@ -187,12 +171,10 @@ After applying the configuration, verify:
 
 2. Network configuration
    - Bridges are created
-   - VLANs are created
    - Network interfaces are configured
 
 3. Storage configuration
    - Storage pools are created
-   - Volumes are created
    - Storage is accessible
 
 * Troubleshooting

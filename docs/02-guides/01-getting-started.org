@@ -11,7 +11,6 @@ This guide will help you get started with the Bricks infrastructure modules.
 - Terraform installed
 - Proxmox host available
 - SSH access to Proxmox host
-- SSH key pair generated
 - Basic understanding of Terraform
 - Basic understanding of Proxmox
 
@@ -54,7 +53,7 @@ root_password      = "your-root-password"
 automation_password = "your-automation-password"
 network_ports      = ["eth0"]
 ssh_port          = 22
-ssh_public_key    = "ssh-rsa AAAA..."
+storage_path      = "/dev/sda3"
 hostname          = "pve"
 #+END_SRC
 
@@ -78,8 +77,26 @@ automation_user = {
   token_id     = "terraform"
   token_secret = "your-token-secret"
 }
-hostname       = "pve"
-ssh_public_key = "ssh-rsa AAAA..."
+target_node = "pve"
+storage_pool = "local-lvm"
+network_bridge = "vmbr0"
+network_gateway = "10.0.0.1"
+
+vms = {
+  "example-vm" = {
+    vmid       = 100
+    template   = "ubuntu-22.04-template"
+    cores      = 2
+    sockets    = 1
+    memory     = 4096
+    disk       = "20G"
+    ip         = "10.0.0.100"
+    ciuser     = "ubuntu"
+    cipassword = "your-password"
+    sshkeys    = "ssh-rsa AAAA..."
+    tags       = ["example", "test"]
+  }
+}
 #+END_SRC
 
 * Step 6: Apply the First VM Configuration

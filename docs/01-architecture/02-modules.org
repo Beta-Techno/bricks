@@ -137,7 +137,7 @@ Each module is documented in the centralized documentation:
 
 * Module Testing
 
-Each module should include:
+Module testing is planned for future implementation and will include:
 
 - Unit tests
 - Integration tests

@@ -42,25 +42,24 @@ Create a `main.tf` file in the `environments/dev/first-vm` directory:
 module "proxmox_compute" {
   source = "../../../modules/proxmox-compute"
   
-  node_name = var.node_name
+  target_node = var.target_node
+  storage_pool = var.storage_pool
+  network_bridge = var.network_bridge
+  network_gateway = var.network_gateway
   
   vms = {
-    "vm-100" = {
-      name        = "ubuntu-server"
-      description = "Ubuntu Server VM"
-      template    = "ubuntu-22.04-template"
-      cores       = 2
-      memory      = 4096
-      disk_size   = "20G"
-      network = {
-        bridge = "vmbr0"
-        vlan   = 100
-      }
-      ip_config = {
-        ip      = "10.0.100.10"
-        netmask = "24"
-        gateway = "10.0.100.1"
-      }
+    "example-vm" = {
+      vmid       = 100
+      template   = "ubuntu-22.04-template"
+      cores      = 2
+      sockets    = 1
+      memory     = 4096
+      disk       = "20G"
+      ip         = "10.0.0.100"
+      ciuser     = "ubuntu"
+      cipassword = "your-password"
+      sshkeys    = var.ssh_public_key
+      tags       = ["example", "test"]
     }
   }
 }
@@ -94,10 +93,32 @@ variable "automation_user" {
   })
 }
 
-variable "node_name" {
-  description = "The name of the Proxmox node"
+variable "target_node" {
+  description = "The target Proxmox node"
   type        = string
   default     = "pve"
+}
+
+variable "storage_pool" {
+  description = "The storage pool to use"
+  type        = string
+  default     = "local-lvm"
+}
+
+variable "network_bridge" {
+  description = "The network bridge to use"
+  type        = string
+  default     = "vmbr0"
+}
+
+variable "network_gateway" {
+  description = "The network gateway"
+  type        = string
+}
+
+variable "ssh_public_key" {
+  description = "The SSH public key for the VM user"
+  type        = string
 }
 #+END_SRC
 
@@ -110,7 +131,11 @@ automation_user = {
   token_id     = "terraform"
   token_secret = "your-token-secret"
 }
-node_name = "pve"
+target_node = "pve"
+storage_pool = "local-lvm"
+network_bridge = "vmbr0"
+network_gateway = "10.0.0.1"
+ssh_public_key = "ssh-rsa AAAA..."
 #+END_SRC
 
 * Verification

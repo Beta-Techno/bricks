@@ -4,14 +4,16 @@
 
 * Compute Module
 
-The compute module manages virtual machines and their resources in Proxmox, including VM creation, resource allocation, and template management.
+The compute module manages virtual machines and containers in Proxmox, including resource allocation and cloud-init configuration.
 
 * Features
 
-- VM management
+- VM management with cloud-init
+- Container management
 - Resource allocation
-- Template management
-- VM storage configuration
+- Network configuration
+- Storage configuration
+- Tag management
 
 * Usage
 
@@ -19,20 +21,36 @@ The compute module manages virtual machines and their resources in Proxmox, incl
 module "proxmox_compute" {
   source = "../../../modules/proxmox-compute"
   
-  node_name = var.hostname
+  target_node = var.target_node
+  storage_pool = var.storage_pool
+  network_bridge = var.network_bridge
+  network_gateway = var.network_gateway
   
   vms = {
-    "vm-100" = {
-      name        = "example-vm"
-      template_id = 100
-      cores       = 2
-      memory      = 4096
-      disk_size   = "20G"
-      network     = "vmbr0"
-      ip_address  = "10.0.0.100"
-      gateway     = "10.0.0.1"
-      dns         = ["8.8.8.8", "8.8.4.4"]
-      ssh_keys    = [var.ssh_public_key]
+    "example-vm" = {
+      vmid       = 100
+      template   = "ubuntu-22.04-template"
+      cores      = 2
+      sockets    = 1
+      memory     = 4096
+      disk       = "20G"
+      ip         = "10.0.0.100"
+      ciuser     = "ubuntu"
+      cipassword = "your-password"
+      sshkeys    = var.ssh_public_key
+      tags       = ["example", "test"]
+    }
+  }
+  
+  containers = {
+    "example-ct" = {
+      template  = "ubuntu-22.04-standard"
+      cores     = 1
+      memory    = 1024
+      swap      = 512
+      disk      = "8G"
+      ip        = "10.0.0.101"
+      tags      = ["example", "test"]
     }
   }
 }
@@ -42,58 +60,80 @@ module "proxmox_compute" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| node_name | The name of the Proxmox node | string | n/a | yes |
+| target_node | The target Proxmox node | string | n/a | yes |
+| storage_pool | The storage pool to use | string | "local-lvm" | no |
+| network_bridge | The network bridge to use | string | "vmbr0" | no |
+| network_gateway | The network gateway | string | n/a | yes |
 | vms | Map of VMs to create | map(object) | {} | no |
+| containers | Map of containers to create | map(object) | {} | no |
 
 ** VM Object
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| name | The name of the VM | string | n/a | yes |
-| template_id | The ID of the template to use | number | n/a | yes |
-| cores | Number of CPU cores | number | n/a | yes |
-| memory | Amount of memory in MB | number | n/a | yes |
-| disk_size | Size of the root disk | string | n/a | yes |
-| network | The network bridge to use | string | n/a | yes |
-| ip_address | The IP address for the VM | string | n/a | yes |
-| gateway | The default gateway | string | n/a | yes |
-| dns | List of DNS servers | list(string) | n/a | yes |
-| ssh_keys | List of SSH public keys | list(string) | n/a | yes |
+| vmid | The VM ID | number | n/a | yes |
+| template | The name of the template to use | string | n/a | yes |
+| cores | Number of CPU cores | number | 2 | no |
+| sockets | Number of CPU sockets | number | 1 | no |
+| memory | Amount of memory in MB | number | 4096 | no |
+| disk | Size of the root disk | string | "20G" | no |
+| ip | The IP address for the VM | string | n/a | yes |
+| ciuser | The cloud-init user | string | n/a | yes |
+| cipassword | The cloud-init password | string | n/a | yes |
+| sshkeys | SSH public key for the VM | string | n/a | yes |
+| tags | List of tags | list(string) | [] | no |
+
+** Container Object
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| template | The name of the template to use | string | n/a | yes |
+| cores | Number of CPU cores | number | 1 | no |
+| memory | Amount of memory in MB | number | 1024 | no |
+| swap | Amount of swap in MB | number | 512 | no |
+| disk | Size of the root disk | string | "8G" | no |
+| ip | The IP address for the container | string | n/a | yes |
+| tags | List of tags | list(string) | [] | no |
 
 * Outputs
 
 | Name | Description |
 |------|-------------|
-| vms | Map of created VMs |
+| vms | Map of created VMs with their details |
+| containers | Map of created containers with their details |
 
 * Example
 
 #+BEGIN_SRC hcl
 # Configure the Proxmox provider
 provider "proxmox" {
-  pm_api_url      = "https://${var.ip_address}:8006/api2/json"
-  pm_user         = "root@pam"
-  pm_password     = var.root_password
-  pm_tls_insecure = true  # For development only
+  pm_api_url          = var.api_url
+  pm_user             = var.automation_user.userid
+  pm_api_token_id     = var.automation_user.token_id
+  pm_api_token_secret = var.automation_user.token_secret
+  pm_tls_insecure     = true
 }
 
 # Configure compute
 module "proxmox_compute" {
   source = "../../../modules/proxmox-compute"
   
-  node_name = "pve"
+  target_node = "pve"
+  storage_pool = "local-lvm"
+  network_bridge = "vmbr0"
+  network_gateway = "10.0.0.1"
   
   vms = {
-    "vm-100" = {
-      name        = "example-vm"
-      template_id = 100
-      cores       = 2
-      memory      = 4096
-      disk_size   = "20G"
-      network     = "vmbr0"
-      ip_address  = "10.0.0.100"
-      gateway     = "10.0.0.1"
-      dns         = ["8.8.8.8", "8.8.4.4"]
-      ssh_keys    = [var.ssh_public_key]
+    "example-vm" = {
+      vmid       = 100
+      template   = "ubuntu-22.04-template"
+      cores      = 2
+      sockets    = 1
+      memory     = 4096
+      disk       = "20G"
+      ip         = "10.0.0.100"
+      ciuser     = "ubuntu"
+      cipassword = "your-password"
+      sshkeys    = var.ssh_public_key
+      tags       = ["example", "test"]
     }
   }
 }
@@ -102,7 +142,8 @@ module "proxmox_compute" {
 * Notes
 
 - VM names must be unique
-- Template IDs must exist
+- Container names must be unique
+- Template names must exist
 - Network bridges must exist
 - IP addresses must be unique
 - Disk sizes must be specified in a format supported by Proxmox (e.g., "20G", "100G")
