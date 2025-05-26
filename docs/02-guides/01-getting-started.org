@@ -1,0 +1,118 @@
+#+TITLE: Getting Started Guide
+#+AUTHOR: Your Name
+#+DATE: 2024
+
+* Getting Started Guide
+
+This guide will help you get started with the Bricks infrastructure modules.
+
+* Prerequisites
+
+- Terraform installed
+- Proxmox host available
+- SSH access to Proxmox host
+- SSH key pair generated
+- Basic understanding of Terraform
+- Basic understanding of Proxmox
+
+* Initial Setup
+
+1. Clone the repository
+2. Configure the Proxmox provider
+3. Configure the first-node environment
+4. Apply the first-node configuration
+5. Configure the first-vm environment
+6. Apply the first-vm configuration
+
+* Step 1: Clone the Repository
+
+#+BEGIN_SRC bash
+git clone https://github.com/your-org/bricks.git
+cd bricks
+#+END_SRC
+
+* Step 2: Configure the Proxmox Provider
+
+Create a `provider.tf` file in the `environments/dev/first-node` directory:
+
+#+BEGIN_SRC hcl
+provider "proxmox" {
+  pm_api_url      = "https://${var.ip_address}:8006/api2/json"
+  pm_user         = "root@pam"
+  pm_password     = var.root_password
+  pm_tls_insecure = true  # For development only
+}
+#+END_SRC
+
+* Step 3: Configure the First Node Environment
+
+Create a `terraform.tfvars` file in the `environments/dev/first-node` directory:
+
+#+BEGIN_SRC hcl
+ip_address         = "10.0.0.10"
+root_password      = "your-root-password"
+automation_password = "your-automation-password"
+network_ports      = ["eth0"]
+ssh_port          = 22
+ssh_public_key    = "ssh-rsa AAAA..."
+hostname          = "pve"
+#+END_SRC
+
+* Step 4: Apply the First Node Configuration
+
+#+BEGIN_SRC bash
+cd environments/dev/first-node
+terraform init
+terraform plan
+terraform apply
+#+END_SRC
+
+* Step 5: Configure the First VM Environment
+
+Create a `terraform.tfvars` file in the `environments/dev/first-vm` directory:
+
+#+BEGIN_SRC hcl
+api_url = "https://10.0.0.10:8006/api2/json"
+automation_user = {
+  userid       = "automation@pve"
+  token_id     = "terraform"
+  token_secret = "your-token-secret"
+}
+hostname       = "pve"
+ssh_public_key = "ssh-rsa AAAA..."
+#+END_SRC
+
+* Step 6: Apply the First VM Configuration
+
+#+BEGIN_SRC bash
+cd environments/dev/first-vm
+terraform init
+terraform plan
+terraform apply
+#+END_SRC
+
+* Next Steps
+
+- Review the architecture overview
+- Review the module references
+- Review the environment references
+- Review the best practices
+- Start using the modules
+
+* Troubleshooting
+
+- Check the Terraform logs
+- Check the Proxmox logs
+- Check the network configuration
+- Check the storage configuration
+- Check the VM configuration
+
+* See Also
+- [[file:../01-architecture/01-overview.org][Architecture Overview]]
+- [[file:../03-reference/01-modules/01-host.org][Host Module Reference]]
+- [[file:../03-reference/01-modules/02-network.org][Network Module Reference]]
+- [[file:../03-reference/01-modules/03-storage.org][Storage Module Reference]]
+- [[file:../03-reference/01-modules/04-compute.org][Compute Module Reference]]
+- [[file:../04-best-practices/01-security.org][Security Best Practices]]
+- [[file:../04-best-practices/02-state-management.org][State Management Best Practices]]
+- [[file:../04-best-practices/03-versioning.org][Versioning Best Practices]] 

@@ -1,0 +1,117 @@
+#+TITLE: Storage Module Reference
+#+AUTHOR: Your Name
+#+DATE: 2024
+
+* Storage Module
+
+The storage module manages storage configuration for Proxmox hosts, including storage pools and volumes.
+
+* Features
+
+- Storage pool management
+- Volume configuration
+- Storage security settings
+- Storage pool monitoring
+
+* Usage
+
+#+BEGIN_SRC hcl
+module "proxmox_storage" {
+  source = "../../../modules/proxmox-storage"
+  
+  node_name = var.hostname
+  
+  pools = {
+    "local-lvm" = {
+      type    = "lvm"
+      path    = "/dev/pve/data"
+      comment = "Local LVM storage pool"
+    }
+  }
+  
+  volumes = {
+    "local-lvm" = {
+      pool    = "local-lvm"
+      size    = "100G"
+      comment = "Local LVM volume"
+    }
+  }
+}
+#+END_SRC
+
+* Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| node_name | The name of the Proxmox node | string | n/a | yes |
+| pools | Map of storage pools to create | map(object) | {} | no |
+| volumes | Map of volumes to create | map(object) | {} | no |
+
+** Pool Object
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| type | The type of storage pool | string | n/a | yes |
+| path | The path to the storage pool | string | n/a | yes |
+| comment | Optional comment for the pool | string | null | no |
+
+** Volume Object
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| pool | The name of the storage pool | string | n/a | yes |
+| size | The size of the volume | string | n/a | yes |
+| comment | Optional comment for the volume | string | null | no |
+
+* Outputs
+
+| Name | Description |
+|------|-------------|
+| pools | Map of created storage pools |
+| volumes | Map of created volumes |
+
+* Example
+
+#+BEGIN_SRC hcl
+# Configure the Proxmox provider
+provider "proxmox" {
+  pm_api_url      = "https://${var.ip_address}:8006/api2/json"
+  pm_user         = "root@pam"
+  pm_password     = var.root_password
+  pm_tls_insecure = true  # For development only
+}
+
+# Configure storage
+module "proxmox_storage" {
+  source = "../../../modules/proxmox-storage"
+  
+  node_name = "pve"
+  
+  pools = {
+    "local-lvm" = {
+      type    = "lvm"
+      path    = "/dev/pve/data"
+      comment = "Local LVM storage pool"
+    }
+  }
+  
+  volumes = {
+    "local-lvm" = {
+      pool    = "local-lvm"
+      size    = "100G"
+      comment = "Local LVM volume"
+    }
+  }
+}
+#+END_SRC
+
+* Notes
+
+- Storage pool names must be unique
+- Volume names must be unique within a pool
+- Storage pool types must be supported by Proxmox
+- Volume sizes must be specified in a format supported by Proxmox (e.g., "100G", "1T")
+- Storage pools must exist before creating volumes
+
+* See Also
+- [[file:../../architecture/overview.org][Architecture Overview]]
+- [[file:../environments/first-node.org][First Node Environment]]
+- [[file:../../best-practices/security.org][Security Best Practices]] 

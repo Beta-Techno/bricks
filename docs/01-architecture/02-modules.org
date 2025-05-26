@@ -1,0 +1,162 @@
+#+TITLE: Module Architecture
+#+AUTHOR: Your Name
+#+DATE: 2024
+
+* Module Architecture
+
+This document describes the architecture of the Bricks infrastructure modules.
+
+* Provider Configuration
+
+All modules use the Proxmox provider with consistent versioning:
+
+#+BEGIN_SRC hcl
+terraform {
+  required_providers {
+    proxmox = {
+      source  = "telmate/proxmox"
+      version = "2.9.14"
+    }
+  }
+}
+#+END_SRC
+
+* Module Structure
+
+Each module follows a consistent structure:
+
+#+BEGIN_SRC
+modules/
+├── proxmox-host/
+│   ├── main.tf          # Host configuration, user management, security
+│   ├── variables.tf     # Input variables
+│   ├── outputs.tf       # Output values
+│   └── versions.tf      # Provider and version constraints
+├── proxmox-network/
+│   ├── main.tf          # Bridge and VLAN configuration
+│   ├── variables.tf     # Input variables
+│   ├── outputs.tf       # Output values
+│   └── versions.tf      # Provider and version constraints
+├── proxmox-storage/
+│   ├── main.tf          # Storage pool and volume management
+│   ├── variables.tf     # Input variables
+│   ├── outputs.tf       # Output values
+│   └── versions.tf      # Provider and version constraints
+└── proxmox-compute/
+    ├── main.tf          # VM and container management
+    ├── variables.tf     # Input variables
+    ├── outputs.tf       # Output values
+    ├── versions.tf      # Provider and version constraints
+    ├── data.tf          # Data sources
+    └── locals.tf        # Local variables
+#+END_SRC
+
+* Module Dependencies
+
+The modules have the following dependencies:
+
+#+BEGIN_SRC
+proxmox-host
+  └── proxmox provider
+
+proxmox-network
+  ├── proxmox provider
+  └── proxmox-host (for node name)
+
+proxmox-storage
+  ├── proxmox provider
+  └── proxmox-host (for node name)
+
+proxmox-compute
+  ├── proxmox provider
+  ├── proxmox-host (for node name)
+  ├── proxmox-network (for network bridges)
+  └── proxmox-storage (for storage pools)
+#+END_SRC
+
+* Module Interfaces
+
+Each module exposes a consistent interface:
+
+** Inputs
+- All inputs are defined in `variables.tf`
+- All inputs have descriptions
+- All inputs have types
+- All inputs have validation rules where appropriate
+- Sensitive inputs are marked as such
+
+** Outputs
+- All outputs are defined in `outputs.tf`
+- All outputs have descriptions
+- All outputs have types
+- All outputs are documented
+
+* Module Features
+
+** Host Module
+- User management with API token support
+- Security hardening (SSH, firewall)
+- Network bridge setup
+- Local storage configuration
+
+** Network Module
+- Multiple bridge support
+- VLAN configuration
+- Network interface management
+- Bridge and VLAN comments
+
+** Storage Module
+- Multiple storage pool support
+- Volume management
+- Content type configuration
+- Storage pool monitoring
+
+** Compute Module
+- VM management with cloud-init
+- Container management
+- Resource allocation
+- Network configuration
+- Storage configuration
+- Tag management
+
+* Module Versioning
+
+Each module follows semantic versioning:
+
+- Major version: Breaking changes
+- Minor version: New features
+- Patch version: Bug fixes
+
+* Module Documentation
+
+Each module is documented in the centralized documentation:
+
+- Module reference documentation in `docs/03-reference/01-modules/`
+- Usage examples in `docs/02-guides/`
+- Best practices in `docs/04-best-practices/`
+
+* Module Testing
+
+Each module should include:
+
+- Unit tests
+- Integration tests
+- Acceptance tests
+- Test documentation
+
+* Module Security
+
+Each module follows security best practices:
+
+- Input validation
+- Output sanitization
+- Secure defaults
+- Security documentation
+
+* See Also
+- [[file:01-overview.org][Architecture Overview]]
+- [[file:03-environments.org][Environment Architecture]]
+- [[file:../03-reference/01-modules/01-host.org][Host Module Reference]]
+- [[file:../03-reference/01-modules/02-network.org][Network Module Reference]]
+- [[file:../03-reference/01-modules/03-storage.org][Storage Module Reference]]
+- [[file:../03-reference/01-modules/04-compute.org][Compute Module Reference]] 

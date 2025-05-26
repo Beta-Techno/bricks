@@ -1,0 +1,150 @@
+#+TITLE: First VM Setup Guide
+#+AUTHOR: Your Name
+#+DATE: 2024
+
+* First VM Setup Guide
+
+This guide will help you create your first virtual machine using the Bricks infrastructure modules.
+
+* Prerequisites
+
+- Terraform installed
+- Proxmox host configured (see first-node setup guide)
+- API token for automation user
+- Basic understanding of Terraform
+- Basic understanding of Proxmox
+
+* Initial Setup
+
+1. Configure the Proxmox provider
+2. Configure the compute module
+3. Apply the configuration
+
+* Step 1: Configure the Proxmox Provider
+
+Create a `provider.tf` file in the `environments/dev/first-vm` directory:
+
+#+BEGIN_SRC hcl
+provider "proxmox" {
+  pm_api_url          = var.api_url
+  pm_user             = var.automation_user.userid
+  pm_api_token_id     = var.automation_user.token_id
+  pm_api_token_secret = var.automation_user.token_secret
+  pm_tls_insecure     = true  # For development only
+}
+#+END_SRC
+
+* Step 2: Configure the Compute Module
+
+Create a `main.tf` file in the `environments/dev/first-vm` directory:
+
+#+BEGIN_SRC hcl
+module "proxmox_compute" {
+  source = "../../../modules/proxmox-compute"
+  
+  node_name = var.node_name
+  
+  vms = {
+    "vm-100" = {
+      name        = "ubuntu-server"
+      description = "Ubuntu Server VM"
+      template    = "ubuntu-22.04-template"
+      cores       = 2
+      memory      = 4096
+      disk_size   = "20G"
+      network = {
+        bridge = "vmbr0"
+        vlan   = 100
+      }
+      ip_config = {
+        ip      = "10.0.100.10"
+        netmask = "24"
+        gateway = "10.0.100.1"
+      }
+    }
+  }
+}
+#+END_SRC
+
+* Step 3: Apply the Configuration
+
+#+BEGIN_SRC bash
+cd environments/dev/first-vm
+terraform init
+terraform plan
+terraform apply
+#+END_SRC
+
+* Configuration Files
+
+** variables.tf
+
+#+BEGIN_SRC hcl
+variable "api_url" {
+  description = "The Proxmox API URL"
+  type        = string
+}
+
+variable "automation_user" {
+  description = "The automation user configuration"
+  type = object({
+    userid        = string
+    token_id      = string
+    token_secret  = string
+  })
+}
+
+variable "node_name" {
+  description = "The name of the Proxmox node"
+  type        = string
+  default     = "pve"
+}
+#+END_SRC
+
+** terraform.tfvars
+
+#+BEGIN_SRC hcl
+api_url = "https://10.0.0.10:8006/api2/json"
+automation_user = {
+  userid       = "automation@pve"
+  token_id     = "terraform"
+  token_secret = "your-token-secret"
+}
+node_name = "pve"
+#+END_SRC
+
+* Verification
+
+After applying the configuration, verify:
+
+1. VM configuration
+   - VM is created
+   - Resources are allocated
+   - Network is configured
+   - Storage is configured
+
+2. VM access
+   - SSH access works
+   - Network connectivity works
+   - Storage is accessible
+
+* Troubleshooting
+
+- Check the Terraform logs
+- Check the Proxmox logs
+- Check the VM configuration
+- Check the network configuration
+- Check the storage configuration
+
+* Next Steps
+
+- Review the module references
+- Review the best practices
+- Start using the modules
+- Create more VMs
+
+* See Also
+- [[file:../01-architecture/01-overview.org][Architecture Overview]]
+- [[file:../03-reference/01-modules/04-compute.org][Compute Module Reference]]
+- [[file:../04-best-practices/01-security.org][Security Best Practices]]
+- [[file:../04-best-practices/02-state-management.org][State Management Best Practices]] 

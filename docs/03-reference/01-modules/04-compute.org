@@ -1,0 +1,114 @@
+#+TITLE: Compute Module Reference
+#+AUTHOR: Your Name
+#+DATE: 2024
+
+* Compute Module
+
+The compute module manages virtual machines and their resources in Proxmox, including VM creation, resource allocation, and template management.
+
+* Features
+
+- VM management
+- Resource allocation
+- Template management
+- VM storage configuration
+
+* Usage
+
+#+BEGIN_SRC hcl
+module "proxmox_compute" {
+  source = "../../../modules/proxmox-compute"
+  
+  node_name = var.hostname
+  
+  vms = {
+    "vm-100" = {
+      name        = "example-vm"
+      template_id = 100
+      cores       = 2
+      memory      = 4096
+      disk_size   = "20G"
+      network     = "vmbr0"
+      ip_address  = "10.0.0.100"
+      gateway     = "10.0.0.1"
+      dns         = ["8.8.8.8", "8.8.4.4"]
+      ssh_keys    = [var.ssh_public_key]
+    }
+  }
+}
+#+END_SRC
+
+* Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| node_name | The name of the Proxmox node | string | n/a | yes |
+| vms | Map of VMs to create | map(object) | {} | no |
+
+** VM Object
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| name | The name of the VM | string | n/a | yes |
+| template_id | The ID of the template to use | number | n/a | yes |
+| cores | Number of CPU cores | number | n/a | yes |
+| memory | Amount of memory in MB | number | n/a | yes |
+| disk_size | Size of the root disk | string | n/a | yes |
+| network | The network bridge to use | string | n/a | yes |
+| ip_address | The IP address for the VM | string | n/a | yes |
+| gateway | The default gateway | string | n/a | yes |
+| dns | List of DNS servers | list(string) | n/a | yes |
+| ssh_keys | List of SSH public keys | list(string) | n/a | yes |
+
+* Outputs
+
+| Name | Description |
+|------|-------------|
+| vms | Map of created VMs |
+
+* Example
+
+#+BEGIN_SRC hcl
+# Configure the Proxmox provider
+provider "proxmox" {
+  pm_api_url      = "https://${var.ip_address}:8006/api2/json"
+  pm_user         = "root@pam"
+  pm_password     = var.root_password
+  pm_tls_insecure = true  # For development only
+}
+
+# Configure compute
+module "proxmox_compute" {
+  source = "../../../modules/proxmox-compute"
+  
+  node_name = "pve"
+  
+  vms = {
+    "vm-100" = {
+      name        = "example-vm"
+      template_id = 100
+      cores       = 2
+      memory      = 4096
+      disk_size   = "20G"
+      network     = "vmbr0"
+      ip_address  = "10.0.0.100"
+      gateway     = "10.0.0.1"
+      dns         = ["8.8.8.8", "8.8.4.4"]
+      ssh_keys    = [var.ssh_public_key]
+    }
+  }
+}
+#+END_SRC
+
+* Notes
+
+- VM names must be unique
+- Template IDs must exist
+- Network bridges must exist
+- IP addresses must be unique
+- Disk sizes must be specified in a format supported by Proxmox (e.g., "20G", "100G")
+- SSH keys must be in the correct format
+
+* See Also
+- [[file:../../architecture/overview.org][Architecture Overview]]
+- [[file:../environments/first-vm.org][First VM Environment]]
+- [[file:../../best-practices/security.org][Security Best Practices]] 
