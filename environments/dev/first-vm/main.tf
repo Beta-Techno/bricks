@@ -7,14 +7,13 @@ terraform {
   }
 }
 
-# Use the proxmox provider module
-module "proxmox_provider" {
-  source = "../../proxmox-provider"
-
-  pm_api_url          = var.pm_api_url
-  pm_user             = var.pm_user
-  pm_api_token_id     = var.pm_api_token_id
-  pm_api_token_secret = var.pm_api_token_secret
+# Configure the Proxmox provider at the root level using automation user
+provider "proxmox" {
+  pm_api_url          = var.api_url
+  pm_user             = var.automation_user.userid
+  pm_api_token_id     = var.automation_user.token_id
+  pm_api_token_secret = var.automation_user.token_secret
+  pm_tls_insecure     = true
 }
 
 # Create a VM

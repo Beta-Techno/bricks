@@ -1,3 +1,4 @@
+# Proxmox host configuration
 ip_address         = "10.0.0.10"  # Change this to your Proxmox host IP
 root_password      = "your-root-password"
 automation_password = "your-automation-password"

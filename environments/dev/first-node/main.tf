@@ -7,9 +7,17 @@ terraform {
   }
 }
 
+# Configure the Proxmox provider at the root level
+provider "proxmox" {
+  pm_api_url      = "https://${var.ip_address}:8006/api2/json"
+  pm_user         = "root@pam"
+  pm_password     = var.root_password
+  pm_tls_insecure = true
+}
+
 # Configure the Proxmox host
 module "proxmox_host" {
-  source = "../../proxmox-host"
+  source = "../../../modules/proxmox-host"
 
   ip_address         = var.ip_address
   root_password      = var.root_password
