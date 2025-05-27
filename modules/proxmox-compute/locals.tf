@@ -11,7 +11,6 @@ locals {
     sockets  = 1
     memory   = 4096
     disk     = "20G"
-    template = "ubuntu-22.04-template"
   }
 
   # Default container settings
@@ -19,7 +18,6 @@ locals {
     cores    = 1
     memory   = 1024
     disk     = "8G"
-    template = "ubuntu-22.04-standard"
   }
 
   # Merge default settings with provided settings

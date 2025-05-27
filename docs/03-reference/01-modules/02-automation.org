@@ -1,0 +1,84 @@
+#+TITLE: Automation Module Reference
+#+AUTHOR: Your Name
+#+DATE: 2024
+
+* Automation Module
+
+This module manages automation users and their API tokens in Proxmox VE clusters. It creates users, generates API tokens, and assigns appropriate roles through ACLs.
+
+* Features
+
+- User management
+- API token generation
+- Role assignment through ACLs
+- Secure secret handling
+- Token expiry configuration
+
+* Usage
+
+#+BEGIN_SRC hcl
+module "proxmox_foundation" {
+  source = "../../../modules/proxmox-foundation"
+}
+
+module "proxmox_automation" {
+  source = "../../../modules/proxmox-automation"
+
+  user_id                = "ops@pve"
+  user_comment          = "Terraform automation user"
+  user_password         = var.automation_password
+  token_id              = "terraform"
+  token_comment         = "Used by Terraform runs"
+  token_expiry          = "2025-12-31"  # Optional: Set token expiry date
+  terraform_admin_role_id = module.proxmox_foundation.terraform_admin_role_id
+  acl_propagate         = true
+
+  depends_on = [module.proxmox_foundation]
+}
+#+END_SRC
+
+* Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| user_id | The ID of the automation user (e.g., 'ops@pve') | string | n/a | yes |
+| user_comment | Comment for the automation user | string | "Terraform automation user" | no |
+| user_password | Password for the automation user | string | n/a | yes |
+| token_id | ID for the API token | string | "terraform" | no |
+| token_comment | Comment for the API token | string | "Used by Terraform runs" | no |
+| token_expiry | Expiry date for the API token (format: YYYY-MM-DD) | string | null | no |
+| terraform_admin_role_id | The ID of the TerraformAdmin role | string | n/a | yes |
+| acl_propagate | Whether to propagate ACLs | bool | true | no |
+
+* Outputs
+
+| Name | Description |
+|------|-------------|
+| user_id | The ID of the created automation user |
+| token_id | The ID of the created API token |
+| token_secret | The secret of the created API token (sensitive) |
+| full_token | The full API token in userid!tokenid=secret format (sensitive) |
+
+* Notes
+
+- The API token secret is only available on initial creation
+- The token is marked with `prevent_destroy` to avoid accidental deletion
+- All sensitive outputs are marked as such
+- The module depends on the foundation module for role IDs
+- User IDs must be in the format 'user@realm'
+- Token IDs can only contain alphanumeric characters, underscores, and hyphens
+- Token expiry dates must be in the format YYYY-MM-DD or null for no expiry
+
+* Requirements
+
+- Proxmox VE 8.x
+- Terraform >= 1.0.0
+- bpg/proxmox provider >= 0.78.0, < 0.79.0
+- Proxmox Foundation module
+
+* See Also
+- [[file:01-foundation.org][Foundation Module]] - Required prerequisite
+- [[file:03-host.org][Host Module]] - Next module in sequence
+- [[file:../../architecture/overview.org][Architecture Overview]]
+- [[file:../../best-practices/security.org][Security Best Practices]]
+- [[file:../environments/first-vm.org][First VM Environment]]

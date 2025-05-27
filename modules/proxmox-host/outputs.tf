@@ -6,9 +6,9 @@ output "api_url" {
 output "automation_user" {
   description = "The automation user details"
   value = {
-    userid        = proxmox_user.automation.userid
-    token_id      = proxmox_api_token.automation.token_id
-    token_secret  = proxmox_api_token.automation.token_secret
+    userid        = proxmox_virtual_environment_user.automation.user_id
+    token_id      = proxmox_virtual_environment_api_token.automation.token_id
+    token_secret  = proxmox_virtual_environment_api_token.automation.secret
   }
   sensitive = true
 }

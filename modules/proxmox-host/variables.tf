@@ -1,3 +1,13 @@
+variable "hostname" {
+  description = "The hostname of the Proxmox host"
+  type        = string
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$", var.hostname))
+    error_message = "The hostname must be alphanumeric with optional hyphens, and cannot start or end with a hyphen."
+  }
+}
+
 variable "ip_address" {
   description = "The IP address of the Proxmox host"
   type        = string
@@ -58,7 +68,7 @@ variable "storage_path" {
   default     = "/dev/sda3"
 
   validation {
-    condition     = can(regex("^/dev/[a-zA-Z0-9]+$", var.storage_path))
+    condition     = can(regex("^/dev/[a-zA-Z0-9]+(?:[0-9]+)?$", var.storage_path))
     error_message = "The storage_path must be a valid device path (e.g., /dev/sda3)."
   }
 } 

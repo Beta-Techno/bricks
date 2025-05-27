@@ -14,12 +14,18 @@ The compute module manages virtual machines and containers in Proxmox, including
 - Network configuration
 - Storage configuration
 - Tag management
+- Template validation
+- Resource limit validation
+- Template state validation
 
 * Usage
 
 #+BEGIN_SRC hcl
 module "proxmox_compute" {
   source = "../../../modules/proxmox-compute"
+  
+  api_url = var.api_url
+  automation_user = var.automation_user
   
   target_node = var.target_node
   storage_pool = var.storage_pool
@@ -29,7 +35,7 @@ module "proxmox_compute" {
   vms = {
     "example-vm" = {
       vmid       = 100
-      template   = "ubuntu-22.04-template"
+      clone_id   = "100"  # Template VM ID
       cores      = 2
       sockets    = 1
       memory     = 4096
@@ -39,18 +45,21 @@ module "proxmox_compute" {
       cipassword = "your-password"
       sshkeys    = var.ssh_public_key
       tags       = ["example", "test"]
+      network_model = "virtio"  # Optional, defaults to "virtio"
     }
   }
   
   containers = {
     "example-ct" = {
-      template  = "ubuntu-22.04-standard"
-      cores     = 1
-      memory    = 1024
-      swap      = 512
-      disk      = "8G"
-      ip        = "10.0.0.101"
-      tags      = ["example", "test"]
+      vmid       = 101
+      template   = "101"  # Template container ID
+      cores      = 1
+      memory     = 1024
+      swap       = 512
+      disk       = "8G"
+      ip         = "10.0.0.101"
+      tags       = ["example", "test"]
+      network_name = "eth0"  # Optional, defaults to "eth0"
     }
   }
 }
@@ -60,6 +69,8 @@ module "proxmox_compute" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| api_url | The API URL for the Proxmox host | string | n/a | yes |
+| automation_user | The automation user details | object | n/a | yes |
 | target_node | The target Proxmox node | string | n/a | yes |
 | storage_pool | The storage pool to use | string | "local-lvm" | no |
 | network_bridge | The network bridge to use | string | "vmbr0" | no |
@@ -67,11 +78,18 @@ module "proxmox_compute" {
 | vms | Map of VMs to create | map(object) | {} | no |
 | containers | Map of containers to create | map(object) | {} | no |
 
+** Automation User Object
+| Name | Description | Type | Required |
+|------|-------------|------|:--------:|
+| userid | The user ID | string | yes |
+| token_id | The API token ID | string | yes |
+| token_secret | The API token secret | string | yes |
+
 ** VM Object
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | vmid | The VM ID | number | n/a | yes |
-| template | The name of the template to use | string | n/a | yes |
+| clone_id | The ID of the template to clone from | string | n/a | yes |
 | cores | Number of CPU cores | number | 2 | no |
 | sockets | Number of CPU sockets | number | 1 | no |
 | memory | Amount of memory in MB | number | 4096 | no |
@@ -81,17 +99,20 @@ module "proxmox_compute" {
 | cipassword | The cloud-init password | string | n/a | yes |
 | sshkeys | SSH public key for the VM | string | n/a | yes |
 | tags | List of tags | list(string) | [] | no |
+| network_model | Network model to use | string | "virtio" | no |
 
 ** Container Object
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| template | The name of the template to use | string | n/a | yes |
+| vmid | The container ID | number | n/a | yes |
+| template | The ID of the template to use | string | n/a | yes |
 | cores | Number of CPU cores | number | 1 | no |
 | memory | Amount of memory in MB | number | 1024 | no |
 | swap | Amount of swap in MB | number | 512 | no |
 | disk | Size of the root disk | string | "8G" | no |
 | ip | The IP address for the container | string | n/a | yes |
 | tags | List of tags | list(string) | [] | no |
+| network_name | Network interface name | string | "eth0" | no |
 
 * Outputs
 
@@ -116,6 +137,13 @@ provider "proxmox" {
 module "proxmox_compute" {
   source = "../../../modules/proxmox-compute"
   
+  api_url = "https://10.0.0.10:8006/api2/json"
+  automation_user = {
+    userid       = "automation@pam"
+    token_id     = "terraform"
+    token_secret = "your-token-secret"
+  }
+  
   target_node = "pve"
   storage_pool = "local-lvm"
   network_bridge = "vmbr0"
@@ -124,7 +152,7 @@ module "proxmox_compute" {
   vms = {
     "example-vm" = {
       vmid       = 100
-      template   = "ubuntu-22.04-template"
+      clone_id   = "100"  # Template VM ID
       cores      = 2
       sockets    = 1
       memory     = 4096
@@ -134,6 +162,7 @@ module "proxmox_compute" {
       cipassword = "your-password"
       sshkeys    = var.ssh_public_key
       tags       = ["example", "test"]
+      network_model = "virtio"
     }
   }
 }
@@ -141,15 +170,33 @@ module "proxmox_compute" {
 
 * Notes
 
-- VM names must be unique
-- Container names must be unique
-- Template names must exist
-- Network bridges must exist
-- IP addresses must be unique
+- VM and container IDs must be between 1 and 999999999
+- Template IDs must exist and be in stopped state
+- CPU cores must be between 1 and 128
+- CPU sockets must be between 1 and 4
+- Memory must be between 1 and 1048576 MB
+- Swap must be between 0 and 1048576 MB
 - Disk sizes must be specified in a format supported by Proxmox (e.g., "20G", "100G")
-- SSH keys must be in the correct format
+- IP addresses must be valid IPv4 addresses
+- Cloud-init username must be between 1 and 32 characters
+- Cloud-init password must be at least 8 characters
+- Network model must be one of: virtio, e1000, rtl8139, vmxnet3
+- Network interface names must be alphanumeric with optional hyphens
+- Target node must be alphanumeric with optional hyphens
+- Storage pool must be alphanumeric with optional hyphens
+- Network bridge must be in the format 'vmbrX' where X is a number
+- Templates are validated to ensure they exist and are in stopped state
+- Resource changes are applied with create_before_destroy strategy
+- Network and disk configurations are ignored in subsequent updates
+
+* Requirements
+
+- Proxmox VE 8.x
+- Terraform >= 1.0.0
+- bpg/proxmox provider >= 0.78.0, < 0.79.0
 
 * See Also
+- [[file:05-storage.org][Storage Module]] - Previous module in sequence
 - [[file:../../architecture/overview.org][Architecture Overview]]
 - [[file:../environments/first-vm.org][First VM Environment]]
 - [[file:../../best-practices/security.org][Security Best Practices]] 

@@ -1,23 +1,19 @@
 output "vms" {
-  description = "The created VMs"
+  description = "Map of created VMs with their details"
   value = {
-    for k, v in proxmox_vm_qemu.vms : k => {
-      id     = v.vmid
-      name   = v.name
-      ip     = v.ipconfig0
-      status = v.status
+    for k, v in proxmox_virtual_environment_vm.vms : k => {
+      id  = v.vm_id
+      ip  = try(v.initialization[0].ip_config[0].ipv4[0].address, null)
     }
   }
 }
 
 output "containers" {
-  description = "The created containers"
+  description = "Map of created containers with their details"
   value = {
-    for k, v in proxmox_lxc.containers : k => {
-      id     = v.vmid
-      name   = v.hostname
-      ip     = v.network[0].ip
-      status = v.status
+    for k, v in proxmox_virtual_environment_container.containers : k => {
+      id  = v.vm_id
+      ip  = try(v.initialization[0].ip_config[0].ipv4[0].address, null)
     }
   }
 } 

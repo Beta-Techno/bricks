@@ -12,6 +12,9 @@ The network module manages network configuration for Proxmox hosts, including Li
 - VLAN setup
 - Network interface management
 - Network security settings
+- VLAN ID validation (1-4094)
+- Bridge name validation
+- Port and interface validation
 
 * Usage
 
@@ -32,7 +35,7 @@ module "proxmox_network" {
   vlans = {
     "vlan100" = {
       vlan_id    = 100
-      interface  = "vmbr0"
+      base_interface = "vmbr0"
       comment    = "VLAN for internal network"
     }
   }
@@ -57,8 +60,8 @@ module "proxmox_network" {
 ** VLAN Object
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| vlan_id | The VLAN ID | number | n/a | yes |
-| interface | The interface to create the VLAN on | string | n/a | yes |
+| vlan_id | The VLAN ID (1-4094) | number | n/a | yes |
+| base_interface | The interface to create the VLAN on | string | n/a | yes |
 | comment | Optional comment for the VLAN | string | null | no |
 
 * Outputs
@@ -96,7 +99,7 @@ module "proxmox_network" {
   vlans = {
     "vlan100" = {
       vlan_id    = 100
-      interface  = "vmbr0"
+      base_interface = "vmbr0"
       comment    = "VLAN for internal network"
     }
   }
@@ -105,13 +108,25 @@ module "proxmox_network" {
 
 * Notes
 
-- Bridge names must be unique
-- VLAN IDs must be unique per interface
+- Bridge names must be unique and follow the format 'vmbrX' where X is a number
+- VLAN IDs must be between 1 and 4094
+- VLAN names must follow the format 'vlanX' where X is a number
 - Network interfaces must exist before being used
+- Bridge ports must be alphanumeric
+- VLAN interfaces must be alphanumeric
 - Bridge names typically follow the format 'vmbrX'
 - VLAN interfaces are automatically named 'vmbrX.Y' where Y is the VLAN ID
+- The node name must be alphanumeric with optional hyphens, and cannot start or end with a hyphen
+
+* Requirements
+
+- Proxmox VE 8.x
+- Terraform >= 1.0.0
+- bpg/proxmox provider >= 0.78.0, < 0.79.0
 
 * See Also
+- [[file:03-host.org][Host Module]] - Previous module in sequence
+- [[file:05-storage.org][Storage Module]] - Next module in sequence
 - [[file:../../architecture/overview.org][Architecture Overview]]
 - [[file:../environments/first-node.org][First Node Environment]]
 - [[file:../../best-practices/security.org][Security Best Practices]] 

@@ -11,7 +11,7 @@ variable "automation_user" {
     token_secret  = string
   })
   sensitive = true
-}
+} 
 
 variable "target_node" {
   description = "The target Proxmox node"

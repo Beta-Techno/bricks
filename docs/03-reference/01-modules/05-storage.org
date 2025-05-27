@@ -12,6 +12,9 @@ The storage module manages storage configuration for Proxmox hosts, including st
 - Volume configuration
 - Storage security settings
 - Storage pool monitoring
+- Content type management
+- Volume format validation
+- Volume size format validation
 
 * Usage
 
@@ -25,15 +28,18 @@ module "proxmox_storage" {
     "local-lvm" = {
       type    = "lvm"
       path    = "/dev/pve/data"
+      content = ["images", "rootdir", "iso", "vztmpl"]
+      enabled = true
       comment = "Local LVM storage pool"
     }
   }
   
   volumes = {
-    "local-lvm" = {
-      pool    = "local-lvm"
-      size    = "100G"
-      comment = "Local LVM volume"
+    "vm-100-disk-0" = {
+      datastore_id = "local-lvm"
+      size         = "100G"
+      format       = "raw"
+      comment      = "VM 100 system disk"
     }
   }
 }
@@ -51,14 +57,18 @@ module "proxmox_storage" {
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | type | The type of storage pool | string | n/a | yes |
-| path | The path to the storage pool | string | n/a | yes |
+| path | The path to the storage pool (required for non-LVM types) | string | n/a | yes (for non-LVM types) |
+| device | The device path for LVM type storage | string | n/a | yes (for LVM types) |
+| content | List of content types | list(string) | n/a | yes |
+| enabled | Whether the pool is enabled | bool | true | no |
 | comment | Optional comment for the pool | string | null | no |
 
 ** Volume Object
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| pool | The name of the storage pool | string | n/a | yes |
-| size | The size of the volume | string | n/a | yes |
+| datastore_id | The ID of the storage pool | string | n/a | yes |
+| size | The size of the volume (e.g., "100G", "1T") | string | n/a | yes |
+| format | The volume format | string | n/a | yes |
 | comment | Optional comment for the volume | string | null | no |
 
 * Outputs
@@ -89,15 +99,18 @@ module "proxmox_storage" {
     "local-lvm" = {
       type    = "lvm"
       path    = "/dev/pve/data"
+      content = ["images", "rootdir", "iso", "vztmpl"]
+      enabled = true
       comment = "Local LVM storage pool"
     }
   }
   
   volumes = {
-    "local-lvm" = {
-      pool    = "local-lvm"
-      size    = "100G"
-      comment = "Local LVM volume"
+    "vm-100-disk-0" = {
+      datastore_id = "local-lvm"
+      size         = "100G"
+      format       = "raw"
+      comment      = "VM 100 system disk"
     }
   }
 }
@@ -105,13 +118,28 @@ module "proxmox_storage" {
 
 * Notes
 
-- Storage pool names must be unique
-- Volume names must be unique within a pool
-- Storage pool types must be supported by Proxmox
+- Storage pool names must be unique and alphanumeric with optional hyphens
+- Volume names must be unique within a pool and alphanumeric with optional hyphens
+- Storage pool types must be one of: lvm, lvmthin, nfs, cifs, dir, rbd, zfs
+- For LVM and LVM-thin types, use the `device` attribute to specify the device path
+- For other storage types, use the `path` attribute to specify the storage location
+- Content types must be one or more of: images, rootdir, iso, vztmpl, snippets, backup
+- Volume formats must be one of: raw, qcow2, vmdk
 - Volume sizes must be specified in a format supported by Proxmox (e.g., "100G", "1T")
+- Volume size format must be a number followed by an optional unit (K, M, G, T, P)
 - Storage pools must exist before creating volumes
+- The datastore_id in volumes must reference an existing storage pool
+- The node name must be alphanumeric with optional hyphens, and cannot start or end with a hyphen
+
+* Requirements
+
+- Proxmox VE 8.x
+- Terraform >= 1.0.0
+- bpg/proxmox provider >= 0.78.0, < 0.79.0
 
 * See Also
+- [[file:04-network.org][Network Module]] - Previous module in sequence
+- [[file:06-compute.org][Compute Module]] - Next module in sequence
 - [[file:../../architecture/overview.org][Architecture Overview]]
 - [[file:../environments/first-node.org][First Node Environment]]
 - [[file:../../best-practices/security.org][Security Best Practices]] 

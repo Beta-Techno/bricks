@@ -13,6 +13,8 @@ The host module manages the initial configuration of a Proxmox host, including u
 - Security hardening
 - Basic network setup (SSH)
 - Local storage configuration
+- Firewall ruleset configuration
+- Storage content type management
 
 * Usage
 
@@ -20,6 +22,7 @@ The host module manages the initial configuration of a Proxmox host, including u
 module "proxmox_host" {
   source = "../../../modules/proxmox-host"
   
+  hostname           = var.hostname
   ip_address         = var.ip_address
   root_password      = var.root_password
   automation_password = var.automation_password
@@ -33,6 +36,7 @@ module "proxmox_host" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| hostname | The hostname of the Proxmox host | string | n/a | yes |
 | ip_address | The IP address of the Proxmox host | string | n/a | yes |
 | root_password | The root password for the Proxmox host | string | n/a | yes |
 | automation_password | The password for the automation user | string | n/a | yes |
@@ -46,6 +50,8 @@ module "proxmox_host" {
 |------|-------------|
 | api_url | The API URL for the Proxmox host |
 | automation_user | The automation user details for API access |
+| storage | The configured storage details |
+| network | The configured network details |
 
 * Example
 
@@ -62,6 +68,7 @@ provider "proxmox" {
 module "proxmox_host" {
   source = "../../../modules/proxmox-host"
   
+  hostname           = "pve"
   ip_address         = "10.0.0.10"
   root_password      = "your-root-password"
   automation_password = "your-automation-password"
@@ -73,14 +80,27 @@ module "proxmox_host" {
 
 * Notes
 
+- The hostname must be alphanumeric with optional hyphens, and cannot start or end with a hyphen
 - The root password must be at least 8 characters long
 - The automation password must be at least 8 characters long
 - The IP address must be a valid IPv4 address
 - The storage path must be a valid device path (e.g., /dev/sda3)
 - Network port names must be alphanumeric
 - The SSH port must be between 1 and 65535
+- Storage content types must be one or more of: images, rootdir, iso, vztmpl, snippets, backup
+- Firewall rulesets are automatically configured for SSH (port 22) and Proxmox web interface (port 8006)
+- The automation user is created with the ID 'automation@pam'
+- The API token is created with the ID 'terraform'
+
+* Requirements
+
+- Proxmox VE 8.x
+- Terraform >= 1.0.0
+- bpg/proxmox provider >= 0.78.0, < 0.79.0
 
 * See Also
+- [[file:02-automation.org][Automation Module]] - Previous module in sequence
+- [[file:04-network.org][Network Module]] - Next module in sequence
 - [[file:../../architecture/overview.org][Architecture Overview]]
 - [[file:../environments/first-node.org][First Node Environment]]
 - [[file:../../best-practices/security.org][Security Best Practices]] 
