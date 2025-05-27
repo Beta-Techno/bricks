@@ -33,10 +33,11 @@ variable "automation_password" {
   description = "The password for the automation user"
   type        = string
   sensitive   = true
+  default     = ""
 
   validation {
-    condition     = length(var.automation_password) >= 8
-    error_message = "The automation_password must be at least 8 characters long."
+    condition     = var.automation_password == "" || length(var.automation_password) >= 8
+    error_message = "The automation_password must be at least 8 characters long if provided."
   }
 }
 

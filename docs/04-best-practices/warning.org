@@ -1,0 +1,18 @@
+* WARNING: Proxmox Terraform Provider Caveats
+
+** Insecure SSL Verification
+- The current Terraform provider configuration for Proxmox uses `insecure = true`.
+- This disables SSL certificate verification for the Proxmox API endpoint.
+- This is NOT recommended for production environments, as it exposes you to potential man-in-the-middle attacks.
+- For production, always use a trusted SSL certificate and set `insecure = false`.
+- See the provider block in `first-node/main.tf` for details.
+
+** Storage Module Temporarily Removed
+- The Proxmox storage module has been removed from the Terraform configuration.
+- Reason: The `bpg/proxmox` provider does not yet support storage pool or volume management.
+- Once support is added, the storage module can be reintroduced for full declarative storage management.
+- Track provider updates at: https://registry.terraform.io/providers/bpg/proxmox/latest/docs
+
+** Action Items
+- Review provider configuration before deploying to production.
+- Monitor the bpg/proxmox provider for storage support updates. 

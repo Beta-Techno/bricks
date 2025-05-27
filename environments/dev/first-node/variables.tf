@@ -32,16 +32,6 @@ variable "root_password" {
   }
 }
 
-variable "automation_password" {
-  description = "The password for the automation user"
-  type        = string
-  sensitive   = true
-  validation {
-    condition     = length(var.automation_password) >= 8
-    error_message = "The automation password must be at least 8 characters long."
-  }
-}
-
 variable "network_ports" {
   description = "List of network ports to configure"
   type        = list(string)
@@ -69,14 +59,5 @@ variable "ssh_public_key" {
   validation {
     condition     = var.ssh_public_key == null || can(regex("^ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3} ([^@]+@[^@]+)$", var.ssh_public_key))
     error_message = "The ssh_public_key must be a valid SSH public key."
-  }
-}
-
-variable "storage_path" {
-  description = "The path to the storage device for the Proxmox host"
-  type        = string
-  validation {
-    condition     = can(regex("^/dev/[a-z0-9]+$", var.storage_path))
-    error_message = "The storage_path must be a valid device path (e.g., /dev/sda3)."
   }
 } 
