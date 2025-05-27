@@ -41,8 +41,8 @@ module "proxmox_storage" {
   pools = {
     "local-lvm" = {
       type    = "lvm"
-      path    = "/dev/sda3"  # This should be the LVM volume group path. Adjust based on your disk layout.
-      content = ["images", "rootdir", "iso"]
+      path    = var.storage_path
+      content = ["images", "rootdir", "iso", "vztmpl"]
       comment = "Local LVM storage for VMs"
     }
   }
