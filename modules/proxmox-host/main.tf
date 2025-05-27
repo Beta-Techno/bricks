@@ -1,8 +1,9 @@
 # Create automation user
 resource "proxmox_virtual_environment_user" "automation" {
-  user_id = "automation@pam"
-  comment = "Terraform automation user"
-  enabled = true
+  user_id  = "automation@pam"
+  comment  = "Terraform automation user"
+  enabled  = true
+  password = var.automation_password
 }
 
 # Create API token for automation user

@@ -13,6 +13,11 @@ output "automation_user" {
   sensitive = true
 }
 
+output "automation_token" {
+  value     = proxmox_virtual_environment_user_token.automation.value
+  sensitive = true
+}
+
 output "storage" {
   description = "The configured storage details"
   value = {
