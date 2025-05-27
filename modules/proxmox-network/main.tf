@@ -8,21 +8,20 @@ resource "proxmox_virtual_environment_network_linux_bridge" "bridges" {
   ports      = each.value.ports
 
   comment = each.value.comment
-}
-
-resource "proxmox_virtual_environment_network_linux_vlan" "vlans" {
-  for_each = var.vlans
-
-  node_name = var.node_name
-  name      = each.key
-  vlan_id   = each.value.vlan_id
-  base_interface = each.value.interface
-  comment   = each.value.comment
+  autostart = true
 
   lifecycle {
-    precondition {
-      condition     = each.value.vlan_id >= 1 && each.value.vlan_id <= 4094
-      error_message = "VLAN ID must be between 1 and 4094"
-    }
+    ignore_changes = [
+      address,
+      gateway
+    ]
   }
-} 
+}
+
+# resource "proxmox_virtual_environment_network_linux_vlan" "vlans" {
+#   for_each = var.vlans
+#   node_name = var.node_name
+#   vlan_id   = each.value.vlan_id
+#   base_interface = each.value.base_interface
+#   comment   = each.value.comment
+# } 

@@ -1,22 +1,15 @@
-terraform {
-  required_providers {
-    proxmox = {
-      source  = "bpg/proxmox"
-      version = ">= 0.78, < 0.79"
-    }
-  }
-}
-
 # Configure the Proxmox host
 module "proxmox_host" {
   source = "../../../modules/proxmox-host"
 
-  ip_address         = var.ip_address
-  root_password      = var.root_password
+  api_endpoint      = var.api_endpoint
+  ip_address        = var.ip_address
+  root_password     = var.root_password
   automation_password = var.automation_password
-  network_ports      = var.network_ports
+  hostname          = var.hostname
+  storage_path      = var.storage_path
+  network_ports     = var.network_ports
   ssh_port          = var.ssh_port
-  ssh_public_key    = var.ssh_public_key
 }
 
 module "proxmox_network" {
@@ -31,21 +24,7 @@ module "proxmox_network" {
       comment    = "Main bridge for VM networking"
     }
   }
-}
-
-module "proxmox_storage" {
-  source = "../../../modules/proxmox-storage"
-  
-  node_name = var.hostname
-  
-  pools = {
-    "local-lvm" = {
-      type    = "lvm"
-      path    = var.storage_path
-      content = ["images", "rootdir", "iso", "vztmpl"]
-      comment = "Local LVM storage for VMs"
-    }
-  }
+  depends_on = [module.proxmox_host]
 }
 
 # Output the API URL and automation user details for use in VM creation
@@ -60,13 +39,8 @@ output "automation_user" {
   sensitive   = true
 }
 
-# Output network and storage details
+# Output network details
 output "bridges" {
   value       = module.proxmox_network.bridges
   description = "The configured network bridges"
-}
-
-output "storage_pools" {
-  value       = module.proxmox_storage.pools
-  description = "The configured storage pools"
 } 

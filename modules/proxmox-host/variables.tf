@@ -71,4 +71,9 @@ variable "storage_path" {
     condition     = can(regex("^/dev/[a-zA-Z0-9]+(?:[0-9]+)?$", var.storage_path))
     error_message = "The storage_path must be a valid device path (e.g., /dev/sda3)."
   }
+}
+
+variable "api_endpoint" {
+  description = "The API endpoint for the Proxmox host"
+  type        = string
 } 

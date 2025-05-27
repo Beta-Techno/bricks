@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    proxmox = {
-      source  = "bpg/proxmox"
-      version = ">= 0.78, < 0.79"
-    }
-  }
-}
-
 # Check if template exists
 data "proxmox_virtual_environment_vm" "template" {
   node_name = var.target_node

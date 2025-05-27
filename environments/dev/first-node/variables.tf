@@ -1,3 +1,8 @@
+variable "api_endpoint" {
+  description = "The API endpoint for the Proxmox host"
+  type        = string
+}
+
 variable "ip_address" {
   description = "The IP address of the Proxmox host"
   type        = string
@@ -60,8 +65,18 @@ variable "ssh_port" {
 variable "ssh_public_key" {
   description = "The SSH public key for the VM user"
   type        = string
+  default     = null
   validation {
-    condition     = can(regex("^ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3} ([^@]+@[^@]+)$", var.ssh_public_key))
+    condition     = var.ssh_public_key == null || can(regex("^ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3} ([^@]+@[^@]+)$", var.ssh_public_key))
     error_message = "The ssh_public_key must be a valid SSH public key."
+  }
+}
+
+variable "storage_path" {
+  description = "The path to the storage device for the Proxmox host"
+  type        = string
+  validation {
+    condition     = can(regex("^/dev/[a-z0-9]+$", var.storage_path))
+    error_message = "The storage_path must be a valid device path (e.g., /dev/sda3)."
   }
 } 

@@ -37,9 +37,9 @@ variable "bridges" {
 variable "vlans" {
   description = "Map of VLANs to create"
   type = map(object({
-    vlan_id    = number
+    vlan_id        = number
     base_interface = string
-    comment    = optional(string)
+    comment        = optional(string)
   }))
   default = {}
 
