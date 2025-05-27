@@ -1,0 +1,172 @@
+# Proxmox Setup Implementation Roadmap
+
+## Phase 1: Foundation (After bpg Provider Migration)
+### 1.1 Module Structure
+```
+bricks/
+├── modules/
+│   ├── proxmox-setup/        # New module for initial setup
+│   │   ├── main.tf          # Core setup resources
+│   │   ├── variables.tf     # Input variables
+│   │   ├── outputs.tf       # Output values
+│   │   └── README.md        # Documentation
+│   └── proxmox-config/      # New module for configuration
+│       ├── main.tf          # Configuration resources
+│       ├── variables.tf     # Input variables
+│       ├── outputs.tf       # Output values
+│       └── README.md        # Documentation
+└── environments/
+    └── edge01/             # Example environment
+        ├── main.tf         # Environment configuration
+        ├── variables.tf    # Environment variables
+        └── terraform.tfvars # Environment values
+```
+
+### 1.2 Setup Module Implementation
+```hcl
+# modules/proxmox-setup/main.tf
+module "proxmox_setup" {
+  source = "./modules/proxmox-setup"
+
+  # Required inputs
+  host     = var.proxmox_host
+  username = var.proxmox_username
+  password = var.proxmox_password
+
+  # Optional inputs
+  role_privileges = var.role_privileges
+  user_comment   = var.user_comment
+  token_name     = var.token_name
+}
+```
+
+## Phase 2: Core Functionality
+### 2.1 Role Management
+- Implement role creation with proper privileges
+- Add role validation
+- Add role state management
+- Add role error handling
+
+### 2.2 User Management
+- Implement user creation
+- Add user validation
+- Add user state management
+- Add user error handling
+
+### 2.3 ACL Management
+- Implement ACL assignment
+- Add ACL validation
+- Add ACL state management
+- Add ACL error handling
+
+### 2.4 API Token Management
+- Implement token generation
+- Add token validation
+- Add token state management
+- Add token error handling
+
+## Phase 3: Integration
+### 3.1 State Management
+- Implement proper state handling
+- Add state validation
+- Add state error handling
+- Add state rollback capability
+
+### 3.2 Error Handling
+- Implement comprehensive error handling
+- Add error reporting
+- Add error recovery
+- Add error logging
+
+### 3.3 Testing
+- Add unit tests
+- Add integration tests
+- Add end-to-end tests
+- Add performance tests
+
+## Phase 4: Documentation
+### 4.1 Module Documentation
+- Add module usage examples
+- Add variable descriptions
+- Add output descriptions
+- Add resource descriptions
+
+### 4.2 Environment Documentation
+- Add environment setup guide
+- Add environment variables guide
+- Add environment validation guide
+- Add environment troubleshooting guide
+
+## Phase 5: CI/CD
+### 5.1 Pipeline Setup
+- Add Terraform plan/apply
+- Add state validation
+- Add error handling
+- Add rollback capability
+
+### 5.2 Testing Pipeline
+- Add unit test pipeline
+- Add integration test pipeline
+- Add end-to-end test pipeline
+- Add performance test pipeline
+
+## Implementation Order
+1. Module Structure
+   - Create directory structure
+   - Create basic files
+   - Add initial documentation
+
+2. Core Functionality
+   - Implement role management
+   - Implement user management
+   - Implement ACL management
+   - Implement API token management
+
+3. Integration
+   - Implement state management
+   - Implement error handling
+   - Implement testing
+   - Implement documentation
+
+4. CI/CD
+   - Implement pipeline setup
+   - Implement testing pipeline
+   - Implement validation
+   - Implement rollback
+
+## Success Criteria
+1. All setup functionality implemented in Terraform
+2. No shell commands or null_resource blocks
+3. Proper state management
+4. Comprehensive error handling
+5. Complete documentation
+6. Working CI/CD pipeline
+7. Passing tests
+8. No regression in existing functionality
+
+## Dependencies
+- bpg/proxmox provider (>= 0.78.0)
+- Terraform (>= 1.0.0)
+- Proxmox VE (>= 7.0)
+- Go (>= 1.18)
+
+## Timeline
+1. Phase 1: 1 week
+2. Phase 2: 2 weeks
+3. Phase 3: 1 week
+4. Phase 4: 1 week
+5. Phase 5: 1 week
+
+Total: 6 weeks
+
+## Notes
+- Start with basic functionality
+- Add features incrementally
+- Test thoroughly
+- Document as you go
+- Review and refine
+- Get feedback early
+- Plan for rollback
+- Consider security
+- Consider performance
+- Consider maintainability 
