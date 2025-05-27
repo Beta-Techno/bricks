@@ -32,6 +32,13 @@ module "proxmox_network" {
   depends_on = [module.proxmox_host]
 }
 
+# Configure Proxmox roles and ACLs
+module "proxmox_foundation" {
+  source = "../../../modules/proxmox-foundation"
+  
+  depends_on = [module.proxmox_host]
+}
+
 # Output the API URL and automation user details for use in VM creation
 output "api_url" {
   value       = module.proxmox_host.api_url

@@ -19,18 +19,21 @@ resource "proxmox_virtual_environment_role" "read_only" {
 # Create base ACLs for each role
 resource "proxmox_virtual_environment_acl" "terraform_admin_global" {
   path      = "/"
-  roles     = [proxmox_virtual_environment_role.terraform_admin.role_id]
+  role_id   = proxmox_virtual_environment_role.terraform_admin.role_id
+  user_id   = "automation@pam"
   propagate = var.acl_propagate
 }
 
 resource "proxmox_virtual_environment_acl" "vm_operator_global" {
   path      = "/"
-  roles     = [proxmox_virtual_environment_role.vm_operator.role_id]
+  role_id   = proxmox_virtual_environment_role.vm_operator.role_id
+  user_id   = "automation@pam"
   propagate = var.acl_propagate
 }
 
 resource "proxmox_virtual_environment_acl" "read_only_global" {
   path      = "/"
-  roles     = [proxmox_virtual_environment_role.read_only.role_id]
+  role_id   = proxmox_virtual_environment_role.read_only.role_id
+  user_id   = "automation@pam"
   propagate = var.acl_propagate
 } 
