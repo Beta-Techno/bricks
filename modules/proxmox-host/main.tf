@@ -4,6 +4,12 @@ resource "proxmox_virtual_environment_user" "automation" {
   comment  = "Terraform automation user"
   enabled  = true
   password = var.automation_password
+
+  lifecycle {
+    # the old provider versions left an `acl` attribute in state;
+    # tell Terraform to ignore it so we don't need the two-step apply
+    ignore_changes = [acl]
+  }
 }
 
 # Create API token for automation user
