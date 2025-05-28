@@ -77,4 +77,26 @@ variable "storage_path" {
 variable "api_endpoint" {
   description = "The API endpoint for the Proxmox host"
   type        = string
+}
+
+variable "root_ssh_public_key" {
+  description = "The SSH public key for root user access"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.root_ssh_public_key == "" || can(regex("^ssh-rsa|^ssh-ed25519|^ssh-dss|^ecdsa-sha2-nistp", var.root_ssh_public_key))
+    error_message = "The root_ssh_public_key must be a valid SSH public key starting with ssh-rsa, ssh-ed25519, ssh-dss, or ecdsa-sha2-nistp."
+  }
+}
+
+variable "automation_ssh_public_key" {
+  description = "The SSH public key for automation user access"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.automation_ssh_public_key == "" || can(regex("^ssh-rsa|^ssh-ed25519|^ssh-dss|^ecdsa-sha2-nistp", var.automation_ssh_public_key))
+    error_message = "The automation_ssh_public_key must be a valid SSH public key starting with ssh-rsa, ssh-ed25519, ssh-dss, or ecdsa-sha2-nistp."
+  }
 } 

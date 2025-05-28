@@ -1,10 +1,3 @@
-provider "proxmox" {
-  endpoint = var.api_endpoint
-  insecure = true
-  username = "root@pam"
-  password = var.root_password
-}
-
 # Configure the Proxmox host
 module "proxmox_host" {
   source = "../../../modules/proxmox-host"
@@ -15,6 +8,7 @@ module "proxmox_host" {
   hostname          = var.hostname
   network_ports     = var.network_ports
   ssh_port          = var.ssh_port
+  root_ssh_public_key = var.root_ssh_public_key
 }
 
 module "proxmox_network" {

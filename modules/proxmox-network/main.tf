@@ -1,3 +1,5 @@
+# vmbr0 is created by default on Proxmox. This resource manages its configuration,
+# but will not attempt to recreate it if it already exists. Changes to address and gateway are ignored for idempotency.
 resource "proxmox_virtual_environment_network_linux_bridge" "bridges" {
   for_each = var.bridges
 
