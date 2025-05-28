@@ -33,6 +33,24 @@ module "proxmox_foundation" {
   depends_on = [module.proxmox_host]
 }
 
+# Manage ISO images
+module "proxmox_iso" {
+  source = "../../../modules/proxmox-iso"
+
+  node_name    = var.hostname
+  storage_pool = "local"
+
+  isos = {
+    "ubuntu-22.04.5-server" = {
+      source_url = "https://releases.ubuntu.com/22.04/ubuntu-22.04.5-live-server-amd64.iso"
+      filename   = "ubuntu-22.04.5-live-server-amd64.iso"
+      overwrite  = true
+    }
+  }
+
+  depends_on = [module.proxmox_host]
+}
+
 # Output the API URL and automation user details for use in VM creation
 output "api_url" {
   value       = module.proxmox_host.api_url
@@ -49,4 +67,10 @@ output "automation_user" {
 output "bridges" {
   value       = module.proxmox_network.bridges
   description = "The configured network bridges"
+}
+
+# Output ISO details
+output "isos" {
+  value       = module.proxmox_iso.isos
+  description = "The managed ISO images"
 } 
