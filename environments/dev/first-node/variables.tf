@@ -70,4 +70,28 @@ variable "ssh_public_key" {
     condition     = var.ssh_public_key == null || can(regex("^ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3} ([^@]+@[^@]+)$", var.ssh_public_key))
     error_message = "The ssh_public_key must be a valid SSH public key."
   }
+}
+
+variable "api_token" {
+  description = "The API token for authentication in the format userid!tokenid=secret"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "storage_path" {
+  description = "The storage path for the Proxmox host"
+  type        = string
+}
+
+variable "storage_vg" {
+  description = "The name of the LVM volume group"
+  type        = string
+  default     = "pve"
+}
+
+variable "automation_password" {
+  description = "The password for the automation user"
+  type        = string
+  sensitive   = true
 } 

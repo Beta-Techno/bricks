@@ -17,6 +17,7 @@ resource "proxmox_virtual_environment_user_token" "automation" {
   user_id    = proxmox_virtual_environment_user.automation.user_id
   token_name = "terraform"
   comment    = "Terraform automation token"
+  privileges_separation = false  # Disable privilege separation
 
   # Prevent accidental token destruction
   lifecycle {

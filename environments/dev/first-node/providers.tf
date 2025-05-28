@@ -9,7 +9,9 @@ terraform {
 
 provider "proxmox" {
   endpoint = var.api_endpoint
-  username = "root@pam"
-  password = var.root_password
+  # Use API token if available, otherwise use root credentials
+  api_token = var.api_token != "" ? var.api_token : null
+  username = var.api_token == "" ? "root@pam" : null
+  password = var.api_token == "" ? var.root_password : null
   insecure = true  # Allow insecure connections for initial setup
 } 

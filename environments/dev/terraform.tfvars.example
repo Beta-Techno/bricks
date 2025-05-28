@@ -1,2 +1,0 @@
-api_endpoint = "https://proxmox.example.com:8006/api2/json"
-api_token   = "userid!tokenid=secret"  # Replace with your actual token 

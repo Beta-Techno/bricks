@@ -2,11 +2,11 @@ variable "terraform_admin_privileges" {
   description = "List of privileges for the TerraformAdmin role"
   type        = list(string)
   default     = [
-    "Sys.Audit",
+    "Sys.Audit",                 # Good practice for logging
     "Sys.Modify",
+    "Datastore.Audit",
     "Datastore.Allocate",
     "Datastore.AllocateSpace",
-    "Datastore.Audit",
     "VM.Allocate",
     "VM.Config.CPU",
     "VM.Config.Memory",
@@ -14,12 +14,14 @@ variable "terraform_admin_privileges" {
     "VM.Config.Disk",
     "VM.Config.HWType",
     "VM.Config.Options",
+    "VM.Config.Cloudinit",       # Required for cloud-init
+    "VM.Config.CDROM",           # For ISO attachment
     "VM.PowerMgmt",
+    "VM.Monitor",
     "Pool.Allocate",
     "SDN.Use",
     "SDN.Audit",
-    "VM.Clone",
-    "VM.Monitor"
+    "VM.Clone"
   ]
 }
 

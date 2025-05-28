@@ -19,7 +19,7 @@ locals {
 
 # Download and manage ISOs
 resource "proxmox_virtual_environment_file" "isos" {
-  for_each = local.iso_ok
+  for_each = var.isos
 
   node_name     = var.node_name
   datastore_id  = var.storage_pool

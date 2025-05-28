@@ -13,12 +13,11 @@ output "ip_address" {
   value       = var.ip_config != null ? var.ip_config.ip : null
 }
 
-output "status" {
-  description = "The current status of the VM"
-  value       = proxmox_virtual_environment_vm.vm.status
-}
-
 output "node_name" {
   description = "The node where the VM is running"
   value       = proxmox_virtual_environment_vm.vm.node_name
+}
+
+output "disk" {
+  value = var.disk
 } 

@@ -1,10 +1,2 @@
-# Proxmox host configuration
-ip_address         = "10.0.0.10"  # Change this to your Proxmox host IP
-hostname          = "pve"        # Change this to your desired hostname
-root_password      = "your-root-password"
-automation_password = "your-automation-password"
-network_ports      = ["eth0"]     # Change this to match your network interface
-ssh_port          = 22           # Change this if you want a different SSH port
-storage_path      = "/dev/sda3"  # Change this to match your storage device
-vm_password        = "your-vm-password"
-ssh_public_key     = "ssh-rsa AAAA..."  # Your SSH public key for VM access 
+api_endpoint = "https://proxmox.example.com:8006/api2/json"
+api_token   = "userid!tokenid=secret"  # Replace with your actual token 

@@ -1,3 +1,8 @@
+locals {
+  disk_bus = trimspace(var.disk.type) != "" ? var.disk.type : "scsi"
+  disk_if  = "${local.disk_bus}0"
+}
+
 # Create the VM
 resource "proxmox_virtual_environment_vm" "vm" {
   node_name = var.node_name
@@ -5,6 +10,9 @@ resource "proxmox_virtual_environment_vm" "vm" {
   name      = var.name
   tags      = var.tags
   template  = var.template
+
+  # Set boot order: first CD-ROM, then disk
+  boot_order = ["ide2", local.disk_if]
 
   # CPU configuration
   cpu {
@@ -18,14 +26,20 @@ resource "proxmox_virtual_environment_vm" "vm" {
     dedicated = var.memory
   }
 
-  # Disk configuration
+  # Disk configuration - API-only path
   disk {
     datastore_id = var.disk.storage
-    file_id      = var.iso.file
-    interface    = var.disk.type
     size         = var.disk.size
+    interface    = local.disk_if
     ssd          = var.disk.ssd
-    discard      = var.disk.discard
+    discard      = "on"
+  }
+
+  # CD-ROM configuration
+  cdrom {
+    file_id = "local:iso/${var.iso.file}"
+    enabled = true
+    interface = "ide2"
   }
 
   # Network configuration
@@ -33,15 +47,6 @@ resource "proxmox_virtual_environment_vm" "vm" {
     bridge = var.network.bridge
     model  = var.network.model
     vlan_id = var.network.tag
-  }
-
-  # Cloud-init configuration if provided
-  dynamic "cloud_init" {
-    for_each = var.cloud_init != null ? [1] : []
-    content {
-      user_data = var.cloud_init.user_data
-      network_config = var.cloud_init.network_config
-    }
   }
 
   # Operating system configuration
@@ -56,13 +61,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
         address = var.ip_config != null ? var.ip_config.ip : null
         gateway = var.ip_config != null ? var.ip_config.gateway : null
       }
-      dns {
-        servers = var.ip_config != null ? var.ip_config.dns : null
-      }
     }
-
-    user_data = var.cloud_init != null ? var.cloud_init.user_data : null
-    ssh_keys  = var.ssh_keys
   }
 
   # Lifecycle configuration

@@ -36,7 +36,7 @@ module "proxmox_foundation" {
 # Manage ISO images
 module "proxmox_iso" {
   source = "../../../modules/proxmox-iso"
-
+  
   node_name    = var.hostname
   storage_pool = "local"
 

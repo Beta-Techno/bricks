@@ -1,23 +1,6 @@
-terraform {
-  required_providers {
-    proxmox = {
-      source  = "bpg/proxmox"
-      version = ">= 0.46.0"
-    }
-  }
-  required_version = ">= 1.0.0"
-}
-
-# Use the same provider configuration as the host setup
-provider "proxmox" {
-  endpoint = var.api_endpoint
-  api_token = var.automation_token
-  insecure = true
-}
-
 # Example VM configuration
 module "example_vm" {
-  source = "../../../../modules/proxmox-vm"
+  source = "../../../modules/proxmox-vm"
 
   node_name = var.hostname
   vm_id     = 100
@@ -33,7 +16,7 @@ module "example_vm" {
   memory = 2048
 
   disk = {
-    size     = "20G"
+    size     = 20
     storage  = "local-lvm"
     type     = "scsi"
     ssd      = true
@@ -68,4 +51,8 @@ module "example_vm" {
     gateway = "10.1.10.1"
     dns     = ["8.8.8.8", "8.8.4.4"]
   }
+}
+
+output "debug_disk" {
+  value = module.example_vm.disk
 } 

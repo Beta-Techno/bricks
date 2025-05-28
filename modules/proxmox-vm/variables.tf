@@ -48,14 +48,14 @@ variable "memory" {
 variable "disk" {
   description = "Disk configuration"
   type = object({
-    size     = string
+    size     = number
     storage  = string
     type     = string
     ssd      = bool
     discard  = bool
   })
   default = {
-    size     = "20G"
+    size     = 20
     storage  = "local-lvm"
     type     = "scsi"
     ssd      = true
