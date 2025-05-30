@@ -1,6 +1,6 @@
 # Example VM configuration
 module "example_vm" {
-  source = "../../../modules/proxmox-vm"
+  source = "../../modules/proxmox/vm"
 
   node_name = var.hostname
   vm_id     = 100

@@ -1,6 +1,6 @@
 # Configure the Proxmox host
 module "proxmox_host" {
-  source = "../../../modules/proxmox-host"
+  source = "../../../modules/proxmox/host"
 
   api_endpoint      = var.api_endpoint
   ip_address        = var.ip_address
@@ -12,7 +12,7 @@ module "proxmox_host" {
 }
 
 module "proxmox_network" {
-  source = "../../../modules/proxmox-network"
+  source = "../../../modules/proxmox/network"
   
   node_name = var.hostname
   
@@ -28,14 +28,14 @@ module "proxmox_network" {
 
 # Configure Proxmox roles and ACLs
 module "proxmox_foundation" {
-  source = "../../../modules/proxmox-foundation"
+  source = "../../../modules/proxmox/foundation"
   
   depends_on = [module.proxmox_host]
 }
 
 # Manage ISO images
 module "proxmox_iso" {
-  source = "../../../modules/proxmox-iso"
+  source = "../../../modules/proxmox/iso"
   
   node_name    = var.hostname
   storage_pool = "local"
