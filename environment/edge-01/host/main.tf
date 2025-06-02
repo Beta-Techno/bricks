@@ -30,7 +30,9 @@ module "proxmox_network" {
 module "proxmox_foundation" {
   source = "../../../modules/proxmox/foundation"
   
-  depends_on = [module.proxmox_host]
+  api_token = var.api_token
+  
+  depends_on = [module.proxmox_host, module.proxmox_network]
 }
 
 # Manage ISO images
@@ -48,7 +50,7 @@ module "proxmox_iso" {
     }
   }
 
-  depends_on = [module.proxmox_host]
+  depends_on = [module.proxmox_host, module.proxmox_foundation]
 }
 
 # Output the API URL and automation user details for use in VM creation
@@ -58,7 +60,7 @@ output "api_url" {
 }
 
 output "automation_user" {
-  value       = module.proxmox_host.automation_user
+  value       = module.proxmox_foundation.automation_user
   description = "The automation user details for API access"
   sensitive   = true
 }

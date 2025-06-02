@@ -29,25 +29,6 @@ variable "root_password" {
   }
 }
 
-variable "automation_password" {
-  description = "The password for the automation user"
-  type        = string
-  sensitive   = true
-  default     = ""
-
-  validation {
-    condition     = var.automation_password == "" || length(var.automation_password) >= 8
-    error_message = "The automation_password must be at least 8 characters long if provided."
-  }
-}
-
-variable "api_token" {
-  description = "The API token for the automation user. If empty, a new token will be created."
-  type        = string
-  default     = ""
-  sensitive   = true
-}
-
 variable "network_ports" {
   description = "The network ports to include in the bridge"
   type        = list(string)

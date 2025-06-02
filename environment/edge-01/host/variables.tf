@@ -92,10 +92,4 @@ variable "storage_vg" {
   description = "The name of the LVM volume group"
   type        = string
   default     = "pve"
-}
-
-variable "automation_password" {
-  description = "The password for the automation user"
-  type        = string
-  sensitive   = true
 } 

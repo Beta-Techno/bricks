@@ -1,7 +1,19 @@
+variable "api_token" {
+  description = "The API token for the automation user. If empty, a new token will be created."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
 variable "terraform_admin_privileges" {
   description = "List of privileges for the TerraformAdmin role"
   type        = list(string)
   default     = [
+    # User management privileges
+    "Permissions.Modify",  # Allows managing permissions cluster-wide
+    "User.Modify",        # Allows managing users and their tokens
+    
+    # Existing privileges
     "Sys.Audit",                 # Good practice for logging
     "Sys.Modify",
     "Datastore.Audit",
