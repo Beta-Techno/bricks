@@ -41,6 +41,13 @@ variable "automation_password" {
   }
 }
 
+variable "api_token" {
+  description = "The API token for the automation user. If empty, a new token will be created."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
 variable "network_ports" {
   description = "The network ports to include in the bridge"
   type        = list(string)
@@ -77,6 +84,7 @@ variable "storage_path" {
 variable "api_endpoint" {
   description = "The API endpoint for the Proxmox host"
   type        = string
+  default     = "https://localhost:8006/api2/json"
 }
 
 variable "root_ssh_public_key" {

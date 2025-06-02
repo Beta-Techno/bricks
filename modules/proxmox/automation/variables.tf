@@ -1,6 +1,7 @@
 variable "user_id" {
   description = "The ID of the automation user (e.g., 'ops@pve')"
   type        = string
+  default     = "automation@pam"
 
   validation {
     condition     = can(regex("^[^@]+@[^@]+$", var.user_id))
@@ -51,6 +52,7 @@ variable "token_expiry" {
 variable "terraform_admin_role_id" {
   description = "The ID of the TerraformAdmin role from the foundation module"
   type        = string
+  default     = "TerraformAdmin"
 }
 
 variable "acl_propagate" {

@@ -67,16 +67,20 @@ variable "ssh_public_key" {
   type        = string
   default     = null
   validation {
-    condition     = var.ssh_public_key == null || can(regex("^ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3} ([^@]+@[^@]+)$", var.ssh_public_key))
+    condition     = var.ssh_public_key == null || can(regex("^ssh-(rsa|ed25519|dss|ecdsa-sha2-nistp) AAAA[0-9A-Za-z+/]+[=]{0,3} ([^@]+@[^@]+)$", var.ssh_public_key))
     error_message = "The ssh_public_key must be a valid SSH public key."
   }
 }
 
 variable "api_token" {
-  description = "The API token for authentication in the format userid!tokenid=secret"
+  description = "The API token for authentication in the format userid!tokenid=secret, or empty string for first run"
   type        = string
   sensitive   = true
   default     = ""
+  validation {
+    condition     = var.api_token == "" || can(regex("^[^@]+@[^!]+![^=]+=.+$", var.api_token))
+    error_message = "The api_token must be empty or in the format userid!tokenid=secret"
+  }
 }
 
 variable "storage_path" {

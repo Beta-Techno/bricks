@@ -7,14 +7,14 @@ output "automation_user" {
   description = "Automation user + token"
   value = {
     userid      = proxmox_virtual_environment_user.automation.user_id
-    token_name  = proxmox_virtual_environment_user_token.automation.token_name
-    full_token  = proxmox_virtual_environment_user_token.automation.value  # userid!token=value
+    token_name  = length(proxmox_virtual_environment_user_token.automation) > 0 ? proxmox_virtual_environment_user_token.automation[0].token_name : null
+    full_token  = length(proxmox_virtual_environment_user_token.automation) > 0 ? proxmox_virtual_environment_user_token.automation[0].value : null
   }
   sensitive = true
 }
 
 output "automation_token" {
-  value     = proxmox_virtual_environment_user_token.automation.value
+  value     = local.effective_token
   sensitive = true
 }
 

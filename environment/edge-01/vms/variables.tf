@@ -3,12 +3,6 @@ variable "api_endpoint" {
   type        = string
 }
 
-variable "automation_token" {
-  description = "The Proxmox API token for automation"
-  type        = string
-  sensitive   = true
-}
-
 variable "hostname" {
   description = "The hostname of the Proxmox node"
   type        = string
