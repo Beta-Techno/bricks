@@ -95,4 +95,9 @@ variable "storage_vg" {
   description = "The name of the LVM volume group"
   type        = string
   default     = "pve"
+}
+
+variable "node_name" {
+  type    = string
+  default = "pve-edge01"
 } 

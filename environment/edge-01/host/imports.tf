@@ -5,5 +5,5 @@
  */
 import {
   to = module.proxmox_network.proxmox_virtual_environment_network_linux_bridge.bridges["vmbr0"]
-  id = "pve-edge02:vmbr0"
+  id = "pve-edge01:vmbr0"
 } 
