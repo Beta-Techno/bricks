@@ -1,3 +1,9 @@
+provider "proxmox" {
+  endpoint = var.api_endpoint
+  api_token = var.api_token
+  insecure = true
+}
+
 # Configure the Proxmox host
 module "proxmox_host" {
   source = "../../../modules/proxmox/host"

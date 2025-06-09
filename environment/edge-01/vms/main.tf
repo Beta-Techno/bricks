@@ -1,6 +1,6 @@
 provider "proxmox" {
   endpoint = "https://your-proxmox-ve-endpoint:8006/api2/json"
-  token    = var.proxmox_token
+  api_token = var.proxmox_token
   insecure = true
 }
 
