@@ -1,3 +1,9 @@
+provider "proxmox" {
+  endpoint = "https://your-proxmox-ve-endpoint:8006/api2/json"
+  token    = var.proxmox_token
+  insecure = true
+}
+
 # Example VM configuration
 module "example_vm" {
   source = "../../../modules/proxmox/vm"
