@@ -1,10 +1,3 @@
-provider "proxmox" {
-  endpoint = var.api_endpoint
-  username = var.username
-  password = var.password
-  insecure = true
-}
-
 # Configure the Proxmox host
 module "proxmox_host" {
   source = "../../../modules/proxmox/host"
