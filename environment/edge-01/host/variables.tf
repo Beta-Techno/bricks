@@ -100,4 +100,16 @@ variable "storage_vg" {
 variable "node_name" {
   type    = string
   default = "pve-edge01"
+}
+
+variable "username" {
+  description = "The username for the Proxmox VE provider"
+  type        = string
+  sensitive   = true
+}
+
+variable "password" {
+  description = "The password for the Proxmox VE provider"
+  type        = string
+  sensitive   = true
 } 

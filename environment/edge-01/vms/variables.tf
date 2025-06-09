@@ -12,4 +12,10 @@ variable "ssh_keys" {
   description = "List of SSH public keys to add to VMs"
   type        = list(string)
   default     = []
+}
+
+variable "proxmox_token" {
+  description = "The API token for the Proxmox VE provider"
+  type        = string
+  sensitive   = true
 } 
