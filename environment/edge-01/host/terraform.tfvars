@@ -1,10 +1,10 @@
-ip_address = "10.1.10.8"
-hostname = "pve-edge01"
+ip_address = "10.1.10.9"
+hostname = "edge-01"
 network_ports = ["enp3s0"]
 ssh_port = 22
 
 # API configuration
-api_endpoint = "https://10.1.10.8:8006/api2/json"
+api_endpoint = "https://10.1.10.9:8006/api2/json"
 
 # Storage configuration
 storage_path = "/dev/sda3"

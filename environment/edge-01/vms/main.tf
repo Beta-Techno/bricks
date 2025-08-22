@@ -1,5 +1,14 @@
+terraform {
+  required_providers {
+    proxmox = {
+      source  = "bpg/proxmox"
+      version = ">= 0.78.0, < 0.79.0"
+    }
+  }
+}
+
 provider "proxmox" {
-  endpoint = "https://your-proxmox-ve-endpoint:8006/api2/json"
+  endpoint = "https://10.1.10.9:8006/api2/json"
   api_token = var.proxmox_token
   insecure = true
 }
